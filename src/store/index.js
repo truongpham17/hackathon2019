@@ -9,7 +9,7 @@ import reducers from '../reducers';
 const persistConfig = {
   key: 'version_1',
   storage: AsyncStorage,
-  // whitelist: ['user', 'print']
+  whitelist: ['user'],
 };
 
 const persistedReducer = persistReducer(persistConfig, reducers);

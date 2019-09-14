@@ -7,6 +7,8 @@ import Navigation from './src/Navigation';
 
 export default class App extends React.Component {
   render() {
+    console.disableYellowBox = true;
+
     return (
       <ReduxProvider store={store}>
         <PersistGate loading={null} persistor={persistor}>

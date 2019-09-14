@@ -2,8 +2,10 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
 import Tts from 'react-native-tts';
+import { connect } from 'react-redux';
 import { GiftedChat } from 'react-native-gifted-chat';
 import { Dialogflow_V2 } from 'react-native-dialogflow';
+import { getSmartPost } from '../../actions';
 import { dialogflowConfig } from '../../env';
 
 const BOT_USER = {
@@ -12,13 +14,12 @@ const BOT_USER = {
   avatar: 'https://i.imgur.com/7k12EPD.png',
 };
 
-class App extends Component {
+class Assistant extends Component {
   state = {
     messages: [
       {
         _id: 1,
-        text:
-          'Hi! I am the FAQ bot 🤖 from Jscrambler.\n\nHow may I help you with today?',
+        text: `Hi ${this.props.user.name}, what do you want to buy`,
         createdAt: new Date(),
         user: BOT_USER,
       },
@@ -47,8 +48,37 @@ class App extends Component {
     );
   }
 
+  onProcess = value => {
+    const data = value.split(',');
+    const dataProcess = {};
+    data.forEach(item => {
+      const itemArr = item.split(':');
+      dataProcess[itemArr[0]] = itemArr[1];
+    });
+    console.log(dataProcess);
+    this.props.getSmartPost(dataProcess, {
+      success: () => {
+        this.props.navigation.navigate('PostList');
+      },
+      failure: () => {
+        this.sendBotResponse(
+          `Sorry we can't find any result. What do you want to buy`
+        );
+        Tts.speak(`Sorry we can't find any result. What do you want to buy`);
+      },
+    });
+  };
+
   handleGoogleResponse(result) {
-    const text = result.queryResult.fulfillmentMessages[0].text.text[0];
+    let text = '';
+    if (
+      result.queryResult.fulfillmentMessages[0].text.text[0].startsWith('type')
+    ) {
+      this.onProcess(result.queryResult.fulfillmentMessages[0].text.text[0]);
+      text = 'Please wait...';
+    } else {
+      text = result.queryResult.fulfillmentMessages[0].text.text[0];
+    }
     this.sendBotResponse(text);
     Tts.speak(text);
   }
@@ -82,4 +112,9 @@ class App extends Component {
   }
 }
 
-export default App;
+export default connect(
+  state => ({
+    user: state.user.buyer,
+  }),
+  { getSmartPost }
+)(Assistant);

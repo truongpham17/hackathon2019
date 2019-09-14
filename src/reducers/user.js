@@ -1,13 +1,18 @@
-import { GET_HELLO_REQUEST, getHelloRequest } from '../actions';
+import {
+  LOGIN_FAILURE,
+  LOGIN_SUCCESS,
+  LOGIN_REQUEST,
+  SIGNUP_SUCCESS,
+} from '../actions';
 
-const INITIAL_STATE = {
-  content: 'Initial content',
-};
+const INITIAL_STATE = {};
 
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case GET_HELLO_REQUEST:
-      return { ...state, content: action.payload };
+    case LOGIN_SUCCESS:
+      return { ...action.payload };
+    case SIGNUP_SUCCESS:
+      return { ...action.payload };
     default:
       return { ...state };
   }
